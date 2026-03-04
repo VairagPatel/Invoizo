@@ -3,8 +3,8 @@ import MainPage from "./pages/MainPage.jsx";
 import PreviewPage from "./components/PreviewPage.jsx";
 import { Toaster } from "react-hot-toast";
 import Dashboard from "./pages/Dashboard.jsx";
-import Menubar from "./components/Menubar.jsx";
-import LandingPage from "./pages/LandingPage/LandingPage.jsx";
+import MenubarModern from "./components/MenubarModern.jsx";
+import LandingPageModern from "./pages/LandingPage/LandingPageModern.jsx";
 import PaymentSuccess from "./pages/PaymentSuccess.jsx";
 import TestPayment from "./pages/TestPayment.jsx";
 import UserSyncHandler from "./components/UserSyncHandler.jsx";
@@ -14,12 +14,12 @@ function App() {
   return (
     <Router>
       <UserSyncHandler />
-      <Menubar />
+      <MenubarModern />
       <Toaster />
 
       <Routes>
         {/* Public Route */}
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<LandingPageModern />} />
 
         {/* Protected Routes - only show if signed in */}
         <Route

@@ -4,6 +4,7 @@ import in.invoizo.invoicegeneratorapi.entity.Invoice;
 import in.invoizo.invoicegeneratorapi.entity.Invoice.InvoiceStatus;
 import in.invoizo.invoicegeneratorapi.exception.DatabaseConnectionException;
 import in.invoizo.invoicegeneratorapi.repository.InvoiceRepository;
+import in.invoizo.invoicegeneratorapi.scheduler.InvoiceStatusScheduler;
 import in.invoizo.invoicegeneratorapi.util.RetryUtil;
 import in.invoizo.invoicegeneratorapi.util.ValidationUtil;
 import in.invoizo.invoicegeneratorapi.validator.StatusTransitionValidator;
@@ -24,6 +25,7 @@ public class InvoiceService {
     private final StatusTransitionValidator statusTransitionValidator;
     private final ValidationUtil validationUtil;
     private final GSTCalculatorService gstCalculatorService;
+    private final InvoiceStatusScheduler invoiceStatusScheduler;
 
     public Invoice saveInvoice(Invoice invoice) {
         // Set default status for new invoices
@@ -146,7 +148,7 @@ public class InvoiceService {
             Instant now = Instant.now();
             switch (newStatus) {
                 case SENT:
-                    invoice.setSentAt(now);
+                    invoice.setEmailSentAt(now);
                     break;
                 case PAID:
                     invoice.setPaidAt(now);
@@ -209,13 +211,18 @@ public class InvoiceService {
      */
     public Invoice getInvoiceById(String invoiceId) {
         try {
-            return RetryUtil.executeWithRetry(
+            Invoice invoice = RetryUtil.executeWithRetry(
                 () -> repository.findById(invoiceId)
                     .orElseThrow(() -> new RuntimeException("Invoice not found: " + invoiceId)),
                 3,
                 500,
                 "Get Invoice By ID"
             );
+            
+            // Check if invoice is overdue and update status if needed
+            invoiceStatusScheduler.checkInvoiceOverdue(invoice);
+            
+            return invoice;
         } catch (DataAccessException e) {
             log.error("Database error fetching invoice: {}", invoiceId, e);
             throw new DatabaseConnectionException("Failed to fetch invoice: " + e.getMessage(), e);

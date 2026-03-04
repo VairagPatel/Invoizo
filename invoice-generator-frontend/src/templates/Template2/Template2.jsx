@@ -1,5 +1,5 @@
 import React from 'react';
-import './template2.css';
+import './Template2.css';
 
 const Template2 = ({ data }) => {
     const formatCurrency = (amount) => {

@@ -303,6 +303,15 @@ const InvoiceForm = () => {
           </div>
           <div className="col-md-6">
             <input
+              type="email"
+              className="form-control"
+              placeholder="Email"
+              value={invoiceData.billing.email || ""}
+              onChange={(e) => handleChange("billing", "email", e.target.value)}
+            />
+          </div>
+          <div className="col-md-6">
+            <input
               type="text"
               className="form-control"
               placeholder="Phone"
@@ -310,7 +319,7 @@ const InvoiceForm = () => {
               onChange={(e) => handleChange("billing", "phone", e.target.value)}
             />
           </div>
-          <div className="col-12">
+          <div className="col-md-6">
             <input
               type="text"
               className="form-control"

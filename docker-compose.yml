@@ -1,0 +1,103 @@
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: invoizo-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: Invoizo
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - invoizo-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/Invoizo --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Spring Boot API
+  backend:
+    build:
+      context: ./invoicegeneratorapi
+      dockerfile: Dockerfile
+    container_name: invoizo-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # MongoDB Configuration
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/Invoizo
+      
+      # Clerk Configuration
+      CLERK_ISSUER: https://tidy-llama-24.clerk.accounts.dev
+      CLERK_JWKS_URL: https://tidy-llama-24.clerk.accounts.dev/.well-known/jwks.json
+      CLERK_WEBHOOK_SECRET: pk_test_dGlkeS1sbGFtYS0yNC5jbGVyay5hY2NvdW50cy5kZXYk
+      
+      # Email Configuration (Brevo)
+      SPRING_MAIL_HOST: smtp-relay.brevo.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: 9665a7001@smtp-brevo.com
+      SPRING_MAIL_PASSWORD: tTS59AqNX4jywQ2c
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
+      SPRING_MAIL_PROTOCOL: smtp
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_FROM: vairag.techwork@gmail.com
+      
+      # Razorpay Configuration
+      RAZORPAY_KEY_ID: rzp_test_RgUK2syr4q4GqY
+      RAZORPAY_KEY_SECRET: V1Xo7qH71Ulp3kU127dMKLqL
+      RAZORPAY_WEBHOOK_SECRET: Vairag@310
+      
+      # Frontend URL
+      FRONTEND_URL: http://localhost:5173
+      
+      # Encryption (optional)
+      ENCRYPTION_SECRET_KEY: ${ENCRYPTION_SECRET_KEY:-}
+      
+      # Java Options
+      JAVA_OPTS: -Xmx512m -Xms256m
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - invoizo-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/webhooks/razorpay/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Frontend React + Vite
+  frontend:
+    build:
+      context: ./invoice-generator-frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: invoizo-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080/api
+      VITE_CLERK_PUBLISHABLE_KEY: ${VITE_CLERK_PUBLISHABLE_KEY:-pk_test_dGlkeS1sbGFtYS0yNC5jbGVyay5hY2NvdW50cy5kZXYk}
+    depends_on:
+      - backend
+    networks:
+      - invoizo-network
+    stdin_open: true
+    tty: true
+
+networks:
+  invoizo-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local

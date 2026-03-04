@@ -1,38 +1,13 @@
 import React, { useState } from 'react';
-import { DollarSign } from 'lucide-react';
-import paymentService from '../service/paymentService';
-import toast from 'react-hot-toast';
-import { useAuth } from '@clerk/clerk-react';
+import { DollarSign, CreditCard } from 'lucide-react';
+import PaymentModal from './PaymentModal';
 
-const PaymentButton = ({ invoice, onPaymentSuccess, size = 'md', variant = 'primary' }) => {
-    const [loading, setLoading] = useState(false);
-    const { getToken } = useAuth();
+const PaymentButton = ({ invoice, onPaymentSuccess, size = 'md', variant = 'primary', showModal = true }) => {
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-    const handleCashPayment = async () => {
-        setLoading(true);
-        try {
-            const invoiceId = invoice.id || invoice._id;
-            if (!invoiceId) {
-                toast.error('Invoice ID not found');
-                return;
-            }
-
-            const token = await getToken();
-            const response = await paymentService.markCashPayment(invoiceId, token);
-            
-            if (response.success) {
-                toast.success('Cash payment marked successfully!');
-                if (onPaymentSuccess) {
-                    onPaymentSuccess();
-                }
-            } else {
-                toast.error(response.message || 'Failed to mark cash payment');
-            }
-        } catch (error) {
-            console.error('Error marking cash payment:', error);
-            toast.error('Failed to mark cash payment');
-        } finally {
-            setLoading(false);
+    const handleClick = () => {
+        if (showModal) {
+            setShowPaymentModal(true);
         }
     };
 
@@ -66,21 +41,30 @@ const PaymentButton = ({ invoice, onPaymentSuccess, size = 'md', variant = 'prim
     };
 
     return (
-        <button
-            className={`btn ${getVariantClass()} ${getSizeClass()} d-flex align-items-center gap-2`}
-            onClick={handleCashPayment}
-            disabled={loading}
-            title={`Mark as Paid - ₹${calculateTotal().toFixed(2)}`}
-        >
-            {loading ? (
-                <div className="spinner-border spinner-border-sm" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-            ) : (
-                <DollarSign size={size === 'sm' ? 14 : size === 'lg' ? 20 : 16} />
+        <>
+            <button
+                className={`btn ${getVariantClass()} ${getSizeClass()} d-flex align-items-center gap-2`}
+                onClick={handleClick}
+                title={`Payment Options - ₹${calculateTotal().toFixed(2)}`}
+            >
+                <CreditCard size={size === 'sm' ? 14 : size === 'lg' ? 20 : 16} />
+                {size !== 'sm' && 'Payment'}
+            </button>
+
+            {showModal && (
+                <PaymentModal
+                    show={showPaymentModal}
+                    onHide={() => setShowPaymentModal(false)}
+                    invoice={invoice}
+                    onPaymentSuccess={() => {
+                        setShowPaymentModal(false);
+                        if (onPaymentSuccess) {
+                            onPaymentSuccess();
+                        }
+                    }}
+                />
             )}
-            {size !== 'sm' && (loading ? 'Marking...' : 'Mark Paid')}
-        </button>
+        </>
     );
 };
 

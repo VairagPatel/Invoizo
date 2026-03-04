@@ -77,7 +77,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
-		<!-- Payment dependencies removed - using cash only -->
+		<!-- Razorpay Payment Gateway -->
+		<dependency>
+			<groupId>com.razorpay</groupId>
+			<artifactId>razorpay-java</artifactId>
+			<version>1.4.6</version>
+		</dependency>
 		<!-- Apache POI for Excel export -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>

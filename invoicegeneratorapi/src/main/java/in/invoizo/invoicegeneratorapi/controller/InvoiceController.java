@@ -6,6 +6,7 @@ import in.invoizo.invoicegeneratorapi.exception.ExportGenerationException;
 import in.invoizo.invoicegeneratorapi.service.EmailService;
 import in.invoizo.invoicegeneratorapi.service.ExportService;
 import in.invoizo.invoicegeneratorapi.service.InvoiceService;
+import in.invoizo.invoicegeneratorapi.service.InvoiceStatusService;
 import in.invoizo.invoicegeneratorapi.service.PaymentService;
 import in.invoizo.invoicegeneratorapi.util.ValidationUtil;
 import lombok.Data;
@@ -37,10 +38,26 @@ public class InvoiceController {
     private final ExportService exportService;
     private final ValidationUtil validationUtil;
     private final PaymentService paymentService;
+    private final InvoiceStatusService statusService;
 
     @PostMapping
     public ResponseEntity<Invoice> saveInvoice(@RequestBody Invoice invoice) {
         return ResponseEntity.ok(service.saveInvoice(invoice));
+    }
+
+    /**
+     * Auto-save invoice as DRAFT
+     * Used for auto-save functionality in frontend
+     */
+    @PostMapping("/draft")
+    public ResponseEntity<Invoice> saveDraft(@RequestBody Invoice invoice, Authentication authentication) {
+        String clerkId = authentication.getName();
+        if (clerkId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+        
+        Invoice savedInvoice = statusService.saveDraft(invoice, clerkId);
+        return ResponseEntity.ok(savedInvoice);
     }
 
     @GetMapping

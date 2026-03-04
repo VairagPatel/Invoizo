@@ -4,7 +4,7 @@ export const AppContext = createContext();
 
 export const initialInvoiceData = {
   title: "Create Invoice",
-  billing: { name: "", phone: "", address: "" },
+  billing: { name: "", phone: "", email: "", address: "" },
   shipping: { name: "", phone: "", address: "" },
   invoice: { number: "", date: "", dueDate: "" },
   account: { name: "", number: "", ifsccode: "" },

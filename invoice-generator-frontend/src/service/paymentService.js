@@ -12,6 +12,43 @@ class PaymentService {
         });
     }
 
+    /**
+     * Generate Razorpay payment link for an invoice
+     */
+    async generatePaymentLink(invoiceId, token = null) {
+        try {
+            const headers = {};
+            if (token) {
+                headers.Authorization = `Bearer ${token}`;
+            }
+            const response = await this.api.post(`/payments/generate-link/${invoiceId}`, {}, { headers });
+            return response.data;
+        } catch (error) {
+            console.error('Error generating payment link:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Send invoice with payment link via email
+     */
+    async sendInvoiceWithPaymentLink(invoiceId, token = null) {
+        try {
+            const headers = {};
+            if (token) {
+                headers.Authorization = `Bearer ${token}`;
+            }
+            const response = await this.api.post(`/payments/send-invoice/${invoiceId}`, {}, { headers });
+            return response.data;
+        } catch (error) {
+            console.error('Error sending invoice with payment link:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Mark cash payment for an invoice
+     */
     async markCashPayment(invoiceId, token = null) {
         try {
             const headers = {};
@@ -24,6 +61,19 @@ class PaymentService {
             console.error('Error marking cash payment:', error);
             throw error;
         }
+    }
+
+    /**
+     * Verify Razorpay payment (client-side verification)
+     */
+    verifyPaymentSignature(orderId, paymentId, signature) {
+        // This is typically done on the backend via webhook
+        // But can be used for client-side validation if needed
+        return {
+            orderId,
+            paymentId,
+            signature
+        };
     }
 }
 

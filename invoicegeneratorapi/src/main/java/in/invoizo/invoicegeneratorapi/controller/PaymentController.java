@@ -21,6 +21,114 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final InvoiceService invoiceService;
 
+    /**
+     * Generate Razorpay payment link for an invoice
+     */
+    @PostMapping("/generate-link/{invoiceId}")
+    public ResponseEntity<?> generatePaymentLink(@PathVariable String invoiceId, Authentication authentication) {
+        log.info("=== GENERATE PAYMENT LINK REQUEST ===");
+        log.info("Invoice ID: {}", invoiceId);
+        
+        try {
+            String clerkId = authentication.getName();
+            if (clerkId == null) {
+                return ResponseEntity.status(401).body(Map.of(
+                    "success", false,
+                    "message", "Authentication required"
+                ));
+            }
+            
+            // Validate invoice ownership
+            Invoice invoice = invoiceService.getInvoiceById(invoiceId);
+            if (invoice == null) {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Invoice not found"
+                ));
+            }
+            
+            if (!clerkId.equals(invoice.getClerkId())) {
+                return ResponseEntity.status(403).body(Map.of(
+                    "success", false,
+                    "message", "Access denied"
+                ));
+            }
+            
+            String paymentLink = paymentService.generatePaymentLink(invoiceId);
+            
+            if (paymentLink == null) {
+                return ResponseEntity.ok(Map.of(
+                    "success", false,
+                    "message", "Razorpay not configured. Please configure Razorpay credentials."
+                ));
+            }
+            
+            log.info("Payment link generated successfully: {}", paymentLink);
+            
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "paymentLink", paymentLink,
+                "message", "Payment link generated successfully"
+            ));
+        } catch (Exception e) {
+            log.error("Error generating payment link for invoice {}", invoiceId, e);
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "Failed to generate payment link: " + e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * Send invoice with payment link via email
+     */
+    @PostMapping("/send-invoice/{invoiceId}")
+    public ResponseEntity<?> sendInvoiceWithPaymentLink(@PathVariable String invoiceId, Authentication authentication) {
+        log.info("=== SEND INVOICE WITH PAYMENT LINK ===");
+        log.info("Invoice ID: {}", invoiceId);
+        
+        try {
+            String clerkId = authentication.getName();
+            if (clerkId == null) {
+                return ResponseEntity.status(401).body(Map.of(
+                    "success", false,
+                    "message", "Authentication required"
+                ));
+            }
+            
+            // Validate invoice ownership
+            Invoice invoice = invoiceService.getInvoiceById(invoiceId);
+            if (invoice == null) {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Invoice not found"
+                ));
+            }
+            
+            if (!clerkId.equals(invoice.getClerkId())) {
+                return ResponseEntity.status(403).body(Map.of(
+                    "success", false,
+                    "message", "Access denied"
+                ));
+            }
+            
+            paymentService.sendInvoiceWithPaymentLink(invoiceId);
+            
+            log.info("Invoice sent with payment link successfully");
+            
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Invoice sent with payment link successfully"
+            ));
+        } catch (Exception e) {
+            log.error("Error sending invoice with payment link {}", invoiceId, e);
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "Failed to send invoice: " + e.getMessage()
+            ));
+        }
+    }
+
     @PostMapping("/mark-cash-payment/{invoiceId}")
     public ResponseEntity<?> markCashPayment(@PathVariable String invoiceId, Authentication authentication) {
         log.info("=== CASH PAYMENT REQUEST ===");
