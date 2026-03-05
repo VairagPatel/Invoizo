@@ -12,7 +12,8 @@ const TestPayment = () => {
         setLoading(true);
         try {
             const token = await getToken();
-            const response = await axios.get('http://localhost:8080/api/payments/test-razorpay', {
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+            const response = await axios.get(`${API_BASE_URL}/payments/test-razorpay`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'

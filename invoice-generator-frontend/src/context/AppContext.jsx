@@ -48,7 +48,7 @@ export const AppContextProvider = (props) => {
     transactionType: "INTRA_STATE"
   });
 
-  const baseURL = "http://localhost:8080/api";
+  const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 
   const contextValue = {
     baseURL,
