@@ -43,14 +43,17 @@ public class RazorpayService {
         try {
             double totalAmount = calculateTotalAmount(invoice);
             
-            // Razorpay test mode limit check (max ₹5,00,000)
-            if (totalAmount > 500000) {
-                log.warn("Invoice amount ₹{} exceeds Razorpay test mode limit of ₹5,00,000", totalAmount);
-                throw new RazorpayException("Invoice amount exceeds Razorpay test mode limit of ₹5,00,000. Please use a smaller amount for testing or activate live mode.");
-            }
-            
             // Convert to paise (Razorpay uses smallest currency unit)
             int amountInPaise = (int) Math.round(totalAmount * 100);
+            
+            log.info("Invoice total: ₹{}, Amount in paise: {}", totalAmount, amountInPaise);
+            
+            // Razorpay test mode limit check (max ₹5,00,000 = 50,000,000 paise)
+            if (amountInPaise > 50000000) {
+                log.warn("Invoice amount {} paise (₹{}) exceeds Razorpay test mode limit of 50,000,000 paise (₹5,00,000)", 
+                    amountInPaise, totalAmount);
+                throw new RazorpayException("Invoice amount ₹" + totalAmount + " exceeds Razorpay test mode limit of ₹5,00,000. Please use a smaller amount for testing or activate live mode.");
+            }
 
             JSONObject paymentLinkRequest = new JSONObject();
             paymentLinkRequest.put("amount", amountInPaise);
