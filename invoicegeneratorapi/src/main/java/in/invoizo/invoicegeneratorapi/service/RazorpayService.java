@@ -105,9 +105,7 @@ public class RazorpayService {
 
             return shortUrl;
         } catch (RazorpayException e) {
-            log.error("❌ Razorpay API Error:");
-            log.error("Error Code: {}", e.getCode());
-            log.error("Error Message: {}", e.getMessage());
+            log.error("❌ Razorpay API Error: {}", e.getMessage());
             log.error("Full Exception:", e);
             throw e;
         } catch (Exception e) {
