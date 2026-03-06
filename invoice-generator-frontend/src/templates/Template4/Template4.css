@@ -1,45 +1,50 @@
-.template4 {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #fff;
-    color: #000;
+/* template4.css - Orange/Amber Theme */
+.template4-wrapper {
+    background-color: #ffffff;
+    font-size: 0.95rem;
+    border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    border: 2px solid #a5f3fc !important;
+    border: 2px solid #fde68a !important;
 }
 
-.template4-company-name {
-    background: linear-gradient(135deg, #0891b2, #06b6d4);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: bold;
-}
-
-.template4-title {
-    font-weight: 600;
-    background: linear-gradient(135deg, #0891b2, #f59e0b);
+.template4 h2 {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
-.template4-table-head {
-    background: linear-gradient(135deg, #0891b2, #0e7490) !important;
-    color: #fff !important;
-    font-weight: 600;
+.template4 h6 {
+    color: #f59e0b !important;
 }
 
-.template4-totals-box {
-    max-width: 400px;
-}
-
-.template4-total-due {
-    background: linear-gradient(135deg, #0891b2, #0e7490);
-    color: white;
-    padding: 10px;
+.notes-section {
+    background: linear-gradient(135deg, #fef3c7, #fed7aa);
+    border-top: 3px solid #fbbf24;
     border-radius: 8px;
 }
 
-.template4-primary-color {
-    color: #0891b2;
-    font-weight: 700;
+.template4 .company-title {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.template4 .template4-table-header {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+.template4 .text-success {
+    color: #f59e0b !important;
+}
+
+.template4 .bg-success {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+}
+
+.template4 .table tbody tr:hover {
+    background-color: #fef3c7 !important;
 }

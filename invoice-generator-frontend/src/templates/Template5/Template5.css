@@ -1,23 +1,50 @@
-.template5 {
+/* template5.css - Red/Rose Theme */
+.template5-wrapper {
+    background-color: #ffffff;
+    font-size: 0.95rem;
+    border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    border: 2px solid #a5f3fc !important;
+    border: 2px solid #fecdd3 !important;
 }
 
-.template5 tr.items-row, .template5 thead tr {
-    border-bottom: 2px solid #0891b2 !important;
+.template5 h2 {
+    background: linear-gradient(135deg, #e11d48, #f43f5e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
-.template5 h4, .template5 h5, .template5 h6 {
-    color: #0891b2;
-    font-weight: 600;
+.template5 h6 {
+    color: #e11d48 !important;
 }
 
-.template5 .template5-table-head {
-    background: linear-gradient(135deg, #0891b2, #0e7490) !important;
+.notes-section {
+    background: linear-gradient(135deg, #ffe4e6, #fef3c7);
+    border-top: 3px solid #f43f5e;
+    border-radius: 8px;
+}
+
+.template5 .company-title {
+    background: linear-gradient(135deg, #e11d48, #f43f5e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.template5 .template5-table-header {
+    background: linear-gradient(135deg, #e11d48, #be123c) !important;
     color: white !important;
     font-weight: 600;
 }
 
-.template5 tbody tr:hover {
-    background-color: #ecfeff !important;
+.template5 .text-success {
+    color: #e11d48 !important;
+}
+
+.template5 .bg-success {
+    background: linear-gradient(135deg, #e11d48, #be123c) !important;
+}
+
+.template5 .table tbody tr:hover {
+    background-color: #ffe4e6 !important;
 }

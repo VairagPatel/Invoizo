@@ -1,55 +1,50 @@
-.template3-container {
-    max-width: 800px;
+/* template3.css - Green/Emerald Theme */
+.template3-wrapper {
+    background-color: #ffffff;
+    font-size: 0.95rem;
+    border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    border: 2px solid #a5f3fc !important;
+    border: 2px solid #a7f3d0 !important;
 }
 
-.template3-heading {
-    background: linear-gradient(135deg, #0891b2, #f59e0b);
+.template3 h2 {
+    background: linear-gradient(135deg, #059669, #10b981);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    font-size: 2rem;
-    font-weight: bold;
 }
 
-.template3-subheading {
-    color: #0891b2;
-    font-weight: 700;
-    border-bottom: 3px solid #06b6d4;
-    padding-bottom: 8px;
-    display: inline-block;
+.template3 h6 {
+    color: #059669 !important;
 }
 
-.template3-bill-box {
-    background: linear-gradient(135deg, #ecfeff, #fef3c7);
-    border: 2px solid #a5f3fc;
-    border-radius: 12px;
-    transition: all 0.3s ease;
+.notes-section {
+    background: linear-gradient(135deg, #d1fae5, #fef3c7);
+    border-top: 3px solid #10b981;
+    border-radius: 8px;
 }
 
-.template3-bill-box:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(8, 145, 178, 0.15);
+.template3 .company-title {
+    background: linear-gradient(135deg, #059669, #10b981);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
-.template3-table-header {
-    background: linear-gradient(135deg, #0891b2, #0e7490) !important;
+.template3 .template3-table-header {
+    background: linear-gradient(135deg, #059669, #047857) !important;
     color: white !important;
     font-weight: 600;
 }
 
-.template3-total-box {
-    width: 100%;
-    max-width: 300px;
-    background: linear-gradient(135deg, #ecfeff, #fef3c7);
-    border: 2px solid #a5f3fc;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(8, 145, 178, 0.1);
+.template3 .text-success {
+    color: #059669 !important;
 }
 
-.template3-total,.template3 .company-title {
-    color: #0891b2;
-    font-weight: 700;
+.template3 .bg-success {
+    background: linear-gradient(135deg, #059669, #047857) !important;
+}
+
+.template3 .table tbody tr:hover {
+    background-color: #d1fae5 !important;
 }
