@@ -1,44 +1,31 @@
 package in.invoizo.invoicegeneratorapi.service;
 
-import com.sendgrid.*;
-import com.sendgrid.helpers.mail.Mail;
-import com.sendgrid.helpers.mail.objects.Content;
-import com.sendgrid.helpers.mail.objects.Email;
 import in.invoizo.invoicegeneratorapi.entity.Invoice;
 import in.invoizo.invoicegeneratorapi.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
+    private static final Logger log = LoggerFactory.getLogger(EmailService.class);
+    
     private final ValidationUtil validationUtil;
-
-    @Value("${sendgrid.api.key:}")
-    private String sendGridApiKey;
-
-    @Value("${spring.mail.username:noreply@invoizo.com}")
-    private String fromEmail;
+    private final SendGridEmailService sendGridEmailService;
 
     public void sendInvoiceEmail(String toEmail, MultipartFile file) throws IOException {
         validationUtil.validateEmail(toEmail);
         
-        if (sendGridApiKey == null || sendGridApiKey.isEmpty()) {
-            log.warn("SendGrid API key not configured. Email not sent.");
-            return;
-        }
-
         String subject = "Your Invoice";
         String htmlContent = "<p>Dear Customer,</p><p>Please find attached your invoice.</p><p>Thank you!</p>";
         
-        sendEmailWithSendGrid(toEmail, subject, htmlContent);
+        sendGridEmailService.sendEmail(toEmail, subject, htmlContent);
     }
 
     public void sendInvoiceWithPaymentLink(Invoice invoice, String paymentLink) {
@@ -55,9 +42,9 @@ public class EmailService {
             String subject = "Invoice #" + invoice.getInvoice().getNumber() + " - Payment Link";
             String htmlContent = buildInvoiceEmailWithPaymentLink(invoice, paymentLink);
             
-            sendEmailWithSendGrid(toEmail, subject, htmlContent);
+            sendGridEmailService.sendEmail(toEmail, subject, htmlContent);
             log.info("Invoice email sent successfully to: {}", toEmail);
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.error("Failed to send invoice email: {}", e.getMessage());
             throw new RuntimeException("Failed to send invoice email: " + e.getMessage(), e);
         }
@@ -78,43 +65,10 @@ public class EmailService {
             String subject = "Payment Received - Invoice #" + invoice.getInvoice().getNumber();
             String htmlContent = buildPaymentConfirmationEmail(invoice);
             
-            sendEmailWithSendGrid(toEmail, subject, htmlContent);
+            sendGridEmailService.sendEmail(toEmail, subject, htmlContent);
             log.info("Payment confirmation email sent successfully to: {}", toEmail);
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.error("Failed to send payment confirmation: {}", e.getMessage());
-        }
-    }
-
-    private void sendEmailWithSendGrid(String toEmail, String subject, String htmlContent) throws IOException {
-        if (sendGridApiKey == null || sendGridApiKey.isEmpty()) {
-            log.warn("SendGrid API key not configured. Email not sent to: {}", toEmail);
-            return;
-        }
-
-        Email from = new Email(fromEmail);
-        Email to = new Email(toEmail);
-        Content content = new Content("text/html", htmlContent);
-        Mail mail = new Mail(from, subject, to, content);
-
-        SendGrid sg = new SendGrid(sendGridApiKey);
-        Request request = new Request();
-
-        try {
-            request.setMethod(Method.POST);
-            request.setEndpoint("mail/send");
-            request.setBody(mail.build());
-            
-            Response response = sg.api(request);
-            
-            if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
-                log.info("Email sent successfully via SendGrid to: {}", toEmail);
-            } else {
-                log.error("Failed to send email via SendGrid. Status: {}, Body: {}", 
-                    response.getStatusCode(), response.getBody());
-            }
-        } catch (IOException ex) {
-            log.error("Error sending email via SendGrid to: {}", toEmail, ex);
-            throw ex;
         }
     }
 

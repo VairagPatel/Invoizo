@@ -4,15 +4,17 @@ import com.sendgrid.*;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
 @Service
-@Slf4j
 public class SendGridEmailService {
+
+    private static final Logger log = LoggerFactory.getLogger(SendGridEmailService.class);
 
     @Value("${sendgrid.api.key:}")
     private String sendGridApiKey;
