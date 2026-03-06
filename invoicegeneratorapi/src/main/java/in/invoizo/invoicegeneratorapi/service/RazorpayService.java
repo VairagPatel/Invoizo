@@ -40,11 +40,14 @@ public class RazorpayService {
             return null;
         }
 
+        double totalAmount = 0;
+        int amountInPaise = 0;
+        
         try {
-            double totalAmount = calculateTotalAmount(invoice);
+            totalAmount = calculateTotalAmount(invoice);
             
             // Convert to paise (Razorpay uses smallest currency unit)
-            int amountInPaise = (int) Math.round(totalAmount * 100);
+            amountInPaise = (int) Math.round(totalAmount * 100);
             
             log.info("=== RAZORPAY PAYMENT LINK GENERATION ===");
             log.info("Invoice ID: {}", invoice.getId());
@@ -107,6 +110,18 @@ public class RazorpayService {
         } catch (RazorpayException e) {
             log.error("❌ Razorpay API Error: {}", e.getMessage());
             log.error("Full Exception:", e);
+            
+            // Check if it's the amount limit error
+            if (e.getMessage() != null && e.getMessage().contains("amount exceeds maximum amount allowed")) {
+                String errorMsg = String.format(
+                    "Razorpay rejected the amount of ₹%.2f (%d paise). " +
+                    "Your Razorpay test account may have a lower limit than the standard ₹5,00,000. " +
+                    "Please check your Razorpay dashboard settings or try with a smaller amount (e.g., ₹10,000).",
+                    totalAmount, amountInPaise
+                );
+                throw new RazorpayException(errorMsg);
+            }
+            
             throw e;
         } catch (Exception e) {
             log.error("❌ Unexpected error creating payment link:", e);
