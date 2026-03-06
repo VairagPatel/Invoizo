@@ -72,6 +72,26 @@ public class EmailService {
         }
     }
 
+    public void sendPaymentReminderEmail(String toEmail, String subject, String body, Invoice invoice) {
+        try {
+            if (toEmail == null || toEmail.isEmpty() || !toEmail.contains("@")) {
+                log.warn("Invalid email address for payment reminder. Skipping email.");
+                return;
+            }
+            
+            // Convert plain text body to HTML
+            String htmlContent = "<html><body style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333;\">" +
+                    "<div style=\"max-width: 600px; margin: 0 auto; padding: 20px;\">" +
+                    "<pre style=\"white-space: pre-wrap; font-family: Arial, sans-serif;\">" + body + "</pre>" +
+                    "</div></body></html>";
+            
+            sendGridEmailService.sendEmail(toEmail, subject, htmlContent);
+            log.info("Payment reminder email sent successfully to: {}", toEmail);
+        } catch (IOException e) {
+            log.error("Failed to send payment reminder email: {}", e.getMessage());
+        }
+    }
+
     private String buildInvoiceEmailWithPaymentLink(Invoice invoice, String paymentLink) {
         double totalAmount = calculateTotalAmount(invoice);
         
