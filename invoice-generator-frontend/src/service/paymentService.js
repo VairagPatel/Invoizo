@@ -30,6 +30,13 @@ class PaymentService {
     }
 
     /**
+     * Alias for generatePaymentLink (for backward compatibility)
+     */
+    async createPaymentLink(invoiceId, token = null) {
+        return this.generatePaymentLink(invoiceId, token);
+    }
+
+    /**
      * Send invoice with payment link via email
      */
     async sendInvoiceWithPaymentLink(invoiceId, token = null) {
