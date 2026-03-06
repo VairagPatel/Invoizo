@@ -46,7 +46,13 @@ public class RazorpayService {
             // Convert to paise (Razorpay uses smallest currency unit)
             int amountInPaise = (int) Math.round(totalAmount * 100);
             
-            log.info("Invoice total: ₹{}, Amount in paise: {}", totalAmount, amountInPaise);
+            log.info("=== RAZORPAY PAYMENT LINK GENERATION ===");
+            log.info("Invoice ID: {}", invoice.getId());
+            log.info("Invoice Number: {}", invoice.getInvoice().getNumber());
+            log.info("Total Amount: ₹{}", totalAmount);
+            log.info("Amount in Paise: {}", amountInPaise);
+            log.info("Customer: {}", invoice.getBilling().getName());
+            log.info("Phone: {}", invoice.getBilling().getPhone());
             
             // Razorpay test mode limit check (max ₹5,00,000 = 50,000,000 paise)
             if (amountInPaise > 50000000) {
@@ -89,16 +95,24 @@ public class RazorpayService {
             notes.put("customer_name", invoice.getBilling().getName());
             paymentLinkRequest.put("notes", notes);
 
-            log.info("Creating Razorpay payment link for invoice: {}", invoice.getId());
+            log.info("Razorpay Request JSON: {}", paymentLinkRequest.toString());
+            log.info("Calling Razorpay API to create payment link...");
+            
             PaymentLink paymentLink = razorpayClient.paymentLink.create(paymentLinkRequest);
 
             String shortUrl = paymentLink.get("short_url");
-            log.info("Payment link created successfully: {}", shortUrl);
+            log.info("✅ Payment link created successfully: {}", shortUrl);
 
             return shortUrl;
         } catch (RazorpayException e) {
-            log.error("Failed to create Razorpay payment link for invoice: {}", invoice.getId(), e);
+            log.error("❌ Razorpay API Error:");
+            log.error("Error Code: {}", e.getCode());
+            log.error("Error Message: {}", e.getMessage());
+            log.error("Full Exception:", e);
             throw e;
+        } catch (Exception e) {
+            log.error("❌ Unexpected error creating payment link:", e);
+            throw new RazorpayException("Unexpected error: " + e.getMessage());
         }
     }
 
